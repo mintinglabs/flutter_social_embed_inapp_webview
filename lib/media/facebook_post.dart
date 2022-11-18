@@ -17,9 +17,20 @@ class FaceBookPost extends SocialEmbedData {
   @override
   String get htmlCode => '''
   <html>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
   <body>
-    <script async defer src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2"></script>  
-    <div class="fb-post" data-href="$targetUrl"></div>
+  <div style="width:${width}px">
+  <div class="fb-post" data-href="$targetUrl"  style="width:100%"></div>
+  </div>
+  <script async defer src="https://connect.facebook.net/en_US/sdk.js"></script>
+  <script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      xfbml      : true,
+      version    : 'v15.0'
+    });
+  };
+  </script>
   </body>
   </html>
     ''';

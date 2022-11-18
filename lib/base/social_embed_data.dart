@@ -4,8 +4,10 @@ abstract class SocialEmbedData {
     this.aspectRatio,
     this.width,
     this.height,
+    this.supportMediaControl = false,
     required this.targetUrl,
   });
+  final bool supportMediaControl;
   final double? width;
   final double? height;
   final double? aspectRatio;

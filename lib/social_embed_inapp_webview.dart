@@ -16,8 +16,44 @@ class SocialEmbedInAppWebView extends StatefulWidget {
       _SocialEmbedInAppWebViewState();
 }
 
-class _SocialEmbedInAppWebViewState extends State<SocialEmbedInAppWebView> {
+class _SocialEmbedInAppWebViewState extends State<SocialEmbedInAppWebView>
+    with WidgetsBindingObserver {
   bool _onLoadStopCalled = false;
+
+  late final InAppWebViewController wbController;
+  late String htmlBody;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.embedData.supportMediaControl) {
+      WidgetsBinding.instance!.addObserver(this);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.embedData.supportMediaControl) {
+      WidgetsBinding.instance!.removeObserver(this);
+    }
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        break;
+      case AppLifecycleState.detached:
+        wbController.evaluateJavascript(source: 'stopVideo()');
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+        wbController.evaluateJavascript(source: 'pauseVideo()');
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -40,18 +76,30 @@ class _SocialEmbedInAppWebViewState extends State<SocialEmbedInAppWebView> {
             disableHorizontalScroll: false,
             disableVerticalScroll: false,
             useShouldOverrideUrlLoading: true,
+            preferredContentMode: UserPreferredContentMode.MOBILE,
+            userAgent:
+                'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36',
           ),
           ios: IOSInAppWebViewOptions(
             allowsInlineMediaPlayback: true,
             allowsAirPlayForMediaPlayback: true,
             allowsPictureInPictureMediaPlayback: true,
+            enableViewportScale: true,
+            // contentInsetAdjustmentBehavior:
+            //     IOSUIScrollViewContentInsetAdjustmentBehavior.ALWAYS,
           ),
           android: AndroidInAppWebViewOptions(
             useWideViewPort: false,
             // useHybridComposition: controller!.flags.useHybridComposition,
           ),
         ),
-        onWebViewCreated: (webController) {},
+        onWebViewCreated: (webController) {
+          wbController = webController;
+        },
+        onLoadError: (InAppWebViewController controller, Uri? url, int code,
+            String message) {
+          print('load error msg:$message  code:$code ');
+        },
         shouldOverrideUrlLoading: (controller, navigationAction) async {
           final uri = navigationAction.request.url;
 
