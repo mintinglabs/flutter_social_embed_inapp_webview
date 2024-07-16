@@ -51,6 +51,8 @@ class _SocialEmbedInAppWebViewState extends State<SocialEmbedInAppWebView>
       case AppLifecycleState.paused:
         wbController.evaluateJavascript(source: 'pauseVideo()');
         break;
+      case AppLifecycleState.hidden:
+        break;
     }
   }
 
@@ -63,7 +65,7 @@ class _SocialEmbedInAppWebViewState extends State<SocialEmbedInAppWebView>
         key: widget.key,
         initialData: InAppWebViewInitialData(
           data: widget.embedData.htmlCode,
-          baseUrl: widget.embedData.baseUrl,
+          baseUrl: WebUri.uri(widget.embedData.baseUrl!),
           encoding: 'utf-8',
           mimeType: 'text/html',
         ),
